@@ -1,25 +1,25 @@
-//call requires
+//requires
 const express = require("express");
-const mongoose = require ("mongoose");
-const require = ("./routes")
-const app = express()
 
-//Port info
-const PORT = 6666;
+const mongoose = require("mongoose");
+const routes = require("./routes");
+const app = express();
+const PORT = process.env.PORT || 6666;
 
-//process.env
-if(process.env.NODE_ENV === "production") {
-    app.use(express.static("client/build"))
-
+// app.use
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// Serve up static assets (usually on heroku)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
 }
 
-//Send the requests to the react APP
-app.get("*", function(req, res) {
-    //this takes the user to the html code (front end)
-    res.sendFile(path.join(__dirname, "client/build/index.html"))
-});
+app.use(routes);
 
-//do an app.listen
+// Connecting to mongo DB
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/reactreadinglist");
+
+// Api starts the server
 app.listen(PORT, function() {
-    console.log( 'Server is now on ${PORT}' );
+  console.log(`Server now listening on ${PORT}!`);
 });
